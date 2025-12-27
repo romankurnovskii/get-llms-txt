@@ -1,7 +1,11 @@
 <div align="center">
-  <img src="./assets/logo.png" alt="get-llms-txt logo" width="200" />
-  
-  <h1>get-llms-txt<br>Generate LLM-friendly llms.txt files from markdown and MDX content</h1>
+ 
+  <h1>get-llms-txt<br>
+
+Generate LLM-friendly llms.txt files from markdown and MDX content</h1>
+
+ <img src="./assets/logo.png" alt="get-llms-txt logo" width="200" />
+ 
 </div>
 
 <p align="center">
