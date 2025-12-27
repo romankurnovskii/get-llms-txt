@@ -120,3 +120,5 @@ lib/
 .DS_Store
 .env
 .vscode
+
+.dev

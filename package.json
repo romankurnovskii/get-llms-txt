@@ -1,18 +1,30 @@
 {
-  "name": "package-name",
+  "name": "next-llms-txt",
   "version": "1.0.0",
-  "description": "DESCRIPTION",
+  "description": "Generate LLM-friendly llms.txt files for Next.js projects (and other markdown/MDX projects)",
   "license": "MIT",
-  "homepage": "https://github.com/romankurnovskii/PACKAGE_NAME#readme",
+  "homepage": "https://github.com/romankurnovskii/next-llms-txt#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/romankurnovskii/PACKAGE_NAME.git"
+    "url": "git+https://github.com/romankurnovskii/next-llms-txt.git"
   },
   "bugs": {
-    "url": "https://github.com/romankurnovskii/PACKAGE_NAME/issues"
+    "url": "https://github.com/romankurnovskii/next-llms-txt/issues"
   },
   "keywords": [
-    "npm-module"
+    "nextjs",
+    "llms",
+    "llms-txt",
+    "ai",
+    "llm-context",
+    "documentation",
+    "markdown",
+    "mdx",
+    "static-site-generator",
+    "gatsby",
+    "astro",
+    "docusaurus",
+    "vitepress"
   ],
   "author": {
     "name": "Roman Kurnovskii",
@@ -29,7 +41,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "package-name": "./dist/bin.js"
+    "next-llms-txt": "./dist/bin.js"
   },
   "scripts": {
     "start": "tsx src/bin.ts",
@@ -58,9 +70,10 @@
   ],
   "dependencies": {
     "commander": "^14.0.2",
-    "eslint-plugin-prettier": "^5.5.4"
+    "glob": "^11.0.0"
   },
   "devDependencies": {
+    "@types/glob": "^8.1.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.0.3",
     "@typescript-eslint/eslint-plugin": "^8.50.1",
