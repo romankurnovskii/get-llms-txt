@@ -69,21 +69,21 @@
     "README.md"
   ],
   "dependencies": {
-    "commander": "^14.0.2",
+    "commander": "^15.0.0",
     "glob": "^13.0.6"
   },
   "devDependencies": {
     "@types/glob": "^9.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.0.3",
+    "@types/node": "^26.6.2",
     "@typescript-eslint/eslint-plugin": "^8.50.1",
     "@typescript-eslint/parser": "^8.50.1",
-    "eslint": "^9.39.2",
+    "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "husky": "^9.1.7",
     "jest": "^30.2.0",
-    "lint-staged": "^16.2.7",
+    "lint-staged": "^17.5.1",
     "prettier": "^3.7.4",
     "ts-jest": "^29.4.6",
     "tsx": "^4.21.0",
