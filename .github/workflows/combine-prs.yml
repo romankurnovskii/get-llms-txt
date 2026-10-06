@@ -1,4 +1,4 @@
-name: Combine PR
+name: Combine PRs
 
 on:
   schedule:
