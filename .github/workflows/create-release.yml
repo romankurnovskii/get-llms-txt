@@ -15,6 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '23'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
       - name: Get Version
         id: get_version
         run: |
@@ -23,17 +34,21 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm install
-          npm test
+          pnpm install
+          pnpm test
+        working-directory: .
+
+      - name: Build
+        run: pnpm run build
         working-directory: .
 
       - name: Upload Assets to Release
         uses: softprops/action-gh-release@v3
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # add write permission https://github.com/romankurnovskii/REPOSITORY/settings/actions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            ./dist/pytree-${{ env.VERSION }}.zip
+            ./dist/get-llms-txt-${{ env.VERSION }}.zip
           draft: false
           name: ${{ env.VERSION }}
           tag_name: ${{ env.VERSION }}
