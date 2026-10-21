@@ -50,8 +50,11 @@ web_modules/
 # Optional npm cache directory
 .npm
 
-# Optional eslint cache
-.eslintcache
+# Optional eslint cache (replaced by biome)
+# .eslintcache
+
+# Biome
+.biome
 
 # Microbundle cache
 .rpt2_cache/
