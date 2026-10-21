@@ -1,6 +1,6 @@
 {
   "name": "get-llms-txt",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "packageManager": "pnpm@10.34.7",
   "description": "Generate LLM-friendly llms.txt files from markdown and MDX content files",
   "license": "MIT",
@@ -55,7 +55,7 @@
     "test": "jest --config jestconfig.json",
     "test:watch": "jest --config jestconfig.json --watch",
     "test:coverage": "jest --config jestconfig.json --coverage",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "prepublishOnly": "npm run type-check && npm run build && npm test && npm run format:check && npm run lint"
   },
   "lint-staged": {

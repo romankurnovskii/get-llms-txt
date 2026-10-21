@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: '24'
           cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Get Version
         id: get_version
@@ -43,9 +44,12 @@ jobs:
         working-directory: .
 
       - name: Package
-        run: |
-          cd dist
-          zip -r "../get-llms-txt-${VERSION}.zip" .
+        run: npm pack
+
+      - name: Publish to npm
+        run: pnpm publish --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Upload Assets to Release
         uses: softprops/action-gh-release@v2
@@ -53,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            ./get-llms-txt-${{ env.VERSION }}.zip
+            ./get-llms-txt-${{ env.VERSION }}.tgz
           draft: false
           name: ${{ env.VERSION }}
           tag_name: ${{ env.VERSION }}

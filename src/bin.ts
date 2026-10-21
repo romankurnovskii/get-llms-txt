@@ -4,12 +4,14 @@ import * as path from 'node:path'
 import { Command } from 'commander'
 import { type GenerateOptions, generateLlmsFiles } from './index.js'
 
+const pkg = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf-8')) as { version: string }
+
 const program = new Command()
 
 program
   .name('get-llms-txt')
   .description('Generate LLM-friendly llms.txt files for your Next.js project')
-  .version('1.0.1')
+  .version(pkg.version)
 
 program
   .option('-c, --content-dir <dir>', 'Content directory to scan', './content')
