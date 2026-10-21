@@ -15,12 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v4
         with:
           node-version: '23'
-          enable-pnpm: true
-          pnpm-version: '10'
           cache: 'pnpm'
 
       - name: Get Version
@@ -39,13 +42,18 @@ jobs:
         run: pnpm run build
         working-directory: .
 
+      - name: Package
+        run: |
+          cd dist
+          zip -r "../get-llms-txt-${VERSION}.zip" .
+
       - name: Upload Assets to Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            ./dist/get-llms-txt-${{ env.VERSION }}.zip
+            ./get-llms-txt-${{ env.VERSION }}.zip
           draft: false
           name: ${{ env.VERSION }}
           tag_name: ${{ env.VERSION }}
