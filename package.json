@@ -1,6 +1,7 @@
 {
   "name": "get-llms-txt",
   "version": "1.0.3",
+  "packageManager": "pnpm@10.34.7",
   "description": "Generate LLM-friendly llms.txt files from markdown and MDX content files",
   "license": "MIT",
   "homepage": "https://github.com/romankurnovskii/get-llms-txt#readme",
