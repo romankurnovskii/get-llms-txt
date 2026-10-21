@@ -34,12 +34,15 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pnpm install
+          which pnpm || (echo "pnpm not found" && exit 1)
+          pnpm install --frozen-lockfile
           pnpm test
         working-directory: .
 
       - name: Build
-        run: pnpm run build
+        run: |
+          which pnpm || (echo "pnpm not found" && exit 1)
+          pnpm run build
         working-directory: .
 
       - name: Upload Assets to Release
