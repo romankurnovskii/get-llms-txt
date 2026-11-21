@@ -1,6 +1,6 @@
 {
   "name": "get-llms-txt",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "packageManager": "pnpm@10.34.7",
   "description": "Generate LLM-friendly llms.txt files from markdown and MDX content files",
   "license": "MIT",
@@ -59,27 +59,20 @@
     "prepublishOnly": "npm run type-check && npm run build && npm test && npm run format:check && npm run lint"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "biome check --write"
-    ]
+    "*.{ts,tsx,js,jsx}": ["biome check --write"]
   },
-  "files": [
-    "dist",
-    "LICENSE",
-    "README.md"
-  ],
+  "files": ["dist", "LICENSE", "README.md"],
   "dependencies": {
-    "commander": "^15.0.0",
-    "glob": "^14.0.3"
+    "commander": "^15.1.0",
+    "glob": "^14.0.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.7",
-    "@types/glob": "^9.0.0",
+    "@biomejs/biome": "2.6.8",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.6",
     "husky": "^9.1.7",
     "jest": "^30.5.2",
-    "lint-staged": "^17.6.0",
+    "lint-staged": "^17.6.1",
     "ts-jest": "^29.4.15",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3"

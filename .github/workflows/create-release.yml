@@ -8,6 +8,7 @@ on:
       - 'package.json'
   release:
     types: [created]
+  workflow_dispatch:
 
 jobs:
   create-release:
@@ -33,6 +34,17 @@ jobs:
           echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
           echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
 
+      - name: Check if version already published
+        id: check
+        run: |
+          PUBLISHED=$(npm view get-llms-txt@"$VERSION" version 2>/dev/null || true)
+          if [ "$PUBLISHED" = "$VERSION" ]; then
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            echo "Version $VERSION already on npm — skipping publish."
+          else
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install Dependencies
         run: |
           pnpm install --frozen-lockfile
@@ -47,11 +59,13 @@ jobs:
         run: npm pack
 
       - name: Publish to npm
+        if: steps.check.outputs.should_publish == 'true'
         run: pnpm publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Upload Assets to Release
+        if: steps.check.outputs.should_publish == 'true'
         uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
