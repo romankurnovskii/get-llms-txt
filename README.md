@@ -1,11 +1,11 @@
 <div align="center">
- 
+
   <h1>get-llms-txt<br>
 
 Generate LLM-friendly llms.txt files from markdown and MDX content</h1>
 
  <img src="./assets/logo.png" alt="get-llms-txt logo" width="200" />
- 
+
 </div>
 
 <p align="center">
@@ -102,7 +102,7 @@ npx get-llms-txt --project-name "My Blog" --project-description "Technical blog 
 ### Programmatic Usage
 
 ```typescript
-import {generateLlmsFiles} from 'get-llms-txt';
+import { generateLlmsFiles } from 'get-llms-txt'
 
 await generateLlmsFiles({
   contentDir: './content',
@@ -110,7 +110,7 @@ await generateLlmsFiles({
   baseUrl: 'https://example.com',
   projectName: 'My Next.js Project',
   projectDescription: 'A collection of technical content',
-});
+})
 ```
 
 ## 🛠️ Installation

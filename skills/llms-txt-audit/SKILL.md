@@ -1,4 +1,5 @@
 ---
+
 name: llms-txt-audit
 description: "Agent skill: audit any website for llms.txt presence, freshness, and validity; generate a compliant llms.txt from site content if missing or stale. Works with Claude Code, Cursor, Codex, and any agent that reads SKILL.md."
 ---
@@ -30,13 +31,13 @@ Audit any website for `llms.txt` — the emerging standard for LLM-friendly site
 
 ## Inputs
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `url` | string | Yes | Root URL of the site to audit (e.g., `https://example.com`) |
-| `max_pages` | integer | No | Maximum pages to crawl for content extraction (default: 50) |
-| `check_freshness_days` | integer | No | Flag `llms.txt` as stale if older than this many days (default: 30) |
-| `generate_if_missing` | boolean | No | Auto-generate `llms.txt` if missing or stale (default: false) |
-| `output_path` | string | No | Local path to write generated `llms.txt` (default: `./llms.txt`) |
+| Parameter              | Type    | Required | Description                                                         |
+| ---------------------- | ------- | -------- | ------------------------------------------------------------------- |
+| `url`                  | string  | Yes      | Root URL of the site to audit (e.g., `https://example.com`)         |
+| `max_pages`            | integer | No       | Maximum pages to crawl for content extraction (default: 50)         |
+| `check_freshness_days` | integer | No       | Flag `llms.txt` as stale if older than this many days (default: 30) |
+| `generate_if_missing`  | boolean | No       | Auto-generate `llms.txt` if missing or stale (default: false)       |
+| `output_path`          | string  | No       | Local path to write generated `llms.txt` (default: `./llms.txt`)    |
 
 ---
 
@@ -67,6 +68,7 @@ If found, parse and verify:
 ```
 
 **Validation checks:**
+
 - [ ] File exists and returns 200 OK
 - [ ] Contains H1 title (first non-empty line starting with `# `)
 - [ ] Contains description paragraph after H1
@@ -87,6 +89,7 @@ BFS crawl from root URL:
 ```
 
 For each page, compute:
+
 - **Title** (from `<title>` or first `<h1>`)
 - **Description** (from `<meta name="description">` or first 160 chars of content)
 - **URL** (canonical)
@@ -115,6 +118,7 @@ One-sentence description of what the site does for visitors.
 ```
 
 **Generation rules:**
+
 - Group links under logical `##` sections (Core, Guides, API, Blog, etc.)
 - Each entry: `- [Title](URL) — one-line benefit for the reader`
 - Sort by priority within each section
