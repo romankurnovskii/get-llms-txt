@@ -68,14 +68,15 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
+    "@swc/core": "1.16.22",
+    "@swc/jest": "0.2.39",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.6",
     "husky": "^9.1.7",
     "jest": "^30.5.2",
     "lint-staged": "^17.6.1",
-    "ts-jest": "^29.4.15",
     "tsx": "^4.23.15",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=22.0.0"

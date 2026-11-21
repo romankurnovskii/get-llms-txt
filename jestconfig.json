@@ -1,5 +1,4 @@
 {
-  "preset": "ts-jest/presets/default-esm",
   "testEnvironment": "node",
   "testMatch": ["**/*.test.ts"],
   "moduleFileExtensions": ["ts", "js", "json", "node"],
@@ -9,9 +8,17 @@
   },
   "transform": {
     "^.+\\.ts$": [
-      "ts-jest",
+      "@swc/jest",
       {
-        "useESM": true
+        "jsc": {
+          "parser": {
+            "syntax": "typescript"
+          },
+          "target": "es2022"
+        },
+        "module": {
+          "type": "es6"
+        }
       }
     ]
   }
