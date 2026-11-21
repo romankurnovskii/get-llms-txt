@@ -32,27 +32,65 @@ export interface ProcessedContent {
 }
 
 /**
+ * Matches a fenced code block, including its opening and closing fence lines.
+ * The backreference keeps the closing fence on the same character as the
+ * opening one, so a ```` block may contain ``` lines. Covers ``` and ~~~.
+ */
+const FENCED_CODE_BLOCK = /^ {0,3}(`{3,}|~{3,})[^\n]*\n[\s\S]*?^ {0,3}\1[^\n]*$/gm
+
+/**
+ * Remove fenced code blocks so line-oriented scans (e.g. the H1 lookup) cannot
+ * match a line that is only an example.
+ */
+function stripFencedCodeBlocks(markdown: string): string {
+  return markdown.replace(FENCED_CODE_BLOCK, '')
+}
+
+/**
+ * Remove JSX components and imports, leaving fenced code blocks untouched:
+ * inside a fence those lines are sample code, not MDX syntax.
+ */
+function stripMdxSyntaxOutsideFences(markdown: string): string {
+  let result = ''
+  let cursor = 0
+  for (const match of markdown.matchAll(FENCED_CODE_BLOCK)) {
+    const start = match.index ?? 0
+    result += stripMdxSyntax(markdown.slice(cursor, start))
+    result += match[0]
+    cursor = start + match[0].length
+  }
+  return result + stripMdxSyntax(markdown.slice(cursor))
+}
+
+function stripMdxSyntax(markdown: string): string {
+  return markdown
+    .replace(/<[A-Z][\w]*[^>]*>[\s\S]*?<\/[A-Z][\w]*>/g, '') // Remove JSX components
+    .replace(/<[A-Z][\w]*[^>]*\/>/g, '') // Remove self-closing JSX components
+    .replace(/import\s+.*?from\s+['"][^'"]+['"];?\s*\n?/g, '') // Remove imports
+}
+
+/**
  * Extract metadata values from JS object string using regex
  */
 export function extractMetadataValues(metadataStr: string): FileMetadata {
   const metadata: FileMetadata = {}
 
   // Extract title
-  const titleMatch = metadataStr.match(/title:\s*['"]([^'"]+)['"]/)
+  const titleMatch = metadataStr.match(/title:\s*(["'])(.*?)\1/)
   if (titleMatch) {
-    metadata.title = titleMatch[1]
+    metadata.title = titleMatch[2]
   }
 
   // Extract description
-  const descMatch = metadataStr.match(/description:\s*['"]([^'"]+)['"]/)
+  const descMatch = metadataStr.match(/description:\s*(["'])(.*?)\1/)
   if (descMatch) {
-    metadata.description = descMatch[1]
+    metadata.description = descMatch[2]
   }
 
   // Extract slug
-  const slugMatch = metadataStr.match(/slug:\s*['"]([^'"]+)['"]/)
+  const slugMatch = metadataStr.match(/slug:\s*(["'])(.*?)\1/)
   if (slugMatch) {
-    metadata.slug = slugMatch[1]
+    metadata.slug = slugMatch[2]
   }
 
   // Extract tags array
@@ -121,10 +159,7 @@ export function processMDXFile(filePath: string): ProcessedContent {
 
   // Remove JSX components and convert to plain markdown where possible
   // For now, we'll keep most MDX syntax but remove React components
-  markdownContent = markdownContent
-    .replace(/<[A-Z][\w]*[^>]*>[\s\S]*?<\/[A-Z][\w]*>/g, '') // Remove JSX components
-    .replace(/<[A-Z][\w]*[^>]*\/>/g, '') // Remove self-closing JSX components
-    .replace(/import\s+.*?from\s+['"][^'"]+['"];?\s*\n?/g, '') // Remove imports
+  markdownContent = stripMdxSyntaxOutsideFences(markdownContent)
 
   return { metadata, content: markdownContent.trim() }
 }
@@ -168,8 +203,8 @@ export function extractTitle(filePath: string, metadata: FileMetadata, content: 
     return metadata.title
   }
 
-  // Try to extract from first H1
-  const h1Match = content.match(/^#\s+(.+)$/m)
+  // Try to extract from first H1, ignoring headings that are only code samples
+  const h1Match = stripFencedCodeBlocks(content).match(/^#\s+(.+)$/m)
   if (h1Match) {
     return h1Match[1]?.trim() || ''
   }
@@ -234,14 +269,13 @@ export async function discoverFiles(contentDir: string, outputDir: string): Prom
       .replace(/\.(en|ru)\.(mdx|md)$/, '.$2') // Remove locale from filename
       .replace(/\.(mdx|md)$/, '.md') // Convert all to .md
 
-    // Handle index files - if filename is index.md, use directory name
+    // Handle index files - if filename is index.md, use directory name.
+    // A root index.md has dir '.', which must keep its own name: path.basename('.')
+    // is '.', so joining would produce '..md'.
     const dir = path.dirname(urlPath)
     const basename = path.basename(urlPath, '.md')
-    if (basename === 'index' || basename === '_index') {
-      const dirName = path.basename(dir)
-      if (dirName) {
-        urlPath = path.join(dir, `${dirName}.md`)
-      }
+    if ((basename === 'index' || basename === '_index') && dir !== '.') {
+      urlPath = path.join(dir, `${path.basename(dir)}.md`)
     }
 
     files.push({

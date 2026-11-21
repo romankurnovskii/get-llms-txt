@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import {
+  discoverFiles,
   extractDescription,
   extractMetadataValues,
   extractTitle,
@@ -28,6 +29,14 @@ describe('extractMetadataValues', () => {
     const result = extractMetadataValues('{}')
     expect(result).toEqual({})
   })
+
+  it('should extract metadata values that contain inner quotes', () => {
+    const metadataStr = `{ title: "Don't panic: a guide", description: 'Use "quotes"', slug: "don't-panic" }`
+    const result = extractMetadataValues(metadataStr)
+    expect(result.title).toBe("Don't panic: a guide")
+    expect(result.description).toBe('Use "quotes"')
+    expect(result.slug).toBe("don't-panic")
+  })
 })
 
 describe('extractTitle', () => {
@@ -53,6 +62,14 @@ describe('extractTitle', () => {
     const filePath = '/test/my-awesome-post.mdx'
     const result = extractTitle(filePath, metadata, content)
     expect(result).toBe('My Awesome Post')
+  })
+
+  it('should ignore H1-looking lines inside fenced code blocks', () => {
+    const metadata = {}
+    const content = '```bash\n# install deps\nnpm i\n```\n\n# Real Title'
+    const filePath = '/test/setup.md'
+    const result = extractTitle(filePath, metadata, content)
+    expect(result).toBe('Real Title')
   })
 })
 
@@ -169,6 +186,70 @@ Content here.`
     expect(result.content).not.toContain('import')
     expect(result.content).toContain('# My Post')
   })
+
+  it('should preserve JSX and imports inside fenced code blocks', () => {
+    const filePath = path.join(tempDir, 'test.mdx')
+    const content = `export const metadata = {
+  title: 'Guide',
+};
+
+# Guide
+
+\`\`\`jsx
+import { Button } from "ui";
+
+export default () => <Button>Click</Button>;
+\`\`\`
+
+<Component prop="value">
+  Some JSX content
+</Component>
+
+Regular markdown content here.`
+
+    fs.writeFileSync(filePath, content, 'utf-8')
+    const result = processMDXFile(filePath)
+
+    expect(result.content).toContain('import { Button } from "ui";')
+    expect(result.content).toContain('<Button>Click</Button>')
+    expect(result.content).not.toContain('<Component')
+    expect(result.content).toContain('Regular markdown content here')
+  })
+
+  it('should preserve fenced code blocks using tildes and long fences', () => {
+    const filePath = path.join(tempDir, 'test.mdx')
+    const content = `# Guide
+
+~~~jsx
+import { Tilde } from "ui";
+~~~
+
+\`\`\`\`mdx
+import { Long } from "ui";
+\`\`\`\`
+
+Done.`
+
+    fs.writeFileSync(filePath, content, 'utf-8')
+    const result = processMDXFile(filePath)
+
+    expect(result.content).toContain('import { Tilde } from "ui";')
+    expect(result.content).toContain('import { Long } from "ui";')
+  })
+
+  it('should not delete a fenced code block wrapped by a JSX component pair', () => {
+    const filePath = path.join(tempDir, 'test.mdx')
+    const content = `<Wrapper>
+\`\`\`jsx
+import { Button } from "ui";
+\`\`\`
+</Wrapper>`
+
+    fs.writeFileSync(filePath, content, 'utf-8')
+    const result = processMDXFile(filePath)
+
+    expect(result.content).toContain('import { Button } from "ui";')
+  })
 })
 
 describe('processMDFile', () => {
@@ -213,6 +294,37 @@ Content here...`
 
     expect(result.metadata).toEqual({})
     expect(result.content).toContain('# My Post')
+  })
+})
+
+describe('discoverFiles', () => {
+  let tempDir: string
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'get-llms-txt-test-'))
+  })
+
+  afterEach(() => {
+    fs.rmSync(tempDir, { recursive: true, force: true })
+  })
+
+  it('should write a root index.md to index.md instead of ..md', async () => {
+    const contentDir = path.join(tempDir, 'content')
+    const outputDir = path.join(tempDir, 'out')
+    fs.mkdirSync(path.join(contentDir, 'docs'), { recursive: true })
+    fs.writeFileSync(path.join(contentDir, 'index.md'), '# Home\n\nWelcome to the site.', 'utf-8')
+    fs.writeFileSync(path.join(contentDir, 'docs', 'index.md'), '# Docs\n\nDocs home.', 'utf-8')
+
+    const files = await discoverFiles(contentDir, outputDir)
+
+    const rootFile = files.find((file) => file.relativePath === 'index.md')
+    expect(rootFile?.url).toBe('/md/index.md')
+    expect(fs.existsSync(path.join(outputDir, 'md', 'index.md'))).toBe(true)
+    expect(fs.existsSync(path.join(outputDir, 'md', '..md'))).toBe(false)
+
+    // Nested index files keep mapping to their directory name
+    const docsFile = files.find((file) => file.relativePath === path.join('docs', 'index.md'))
+    expect(docsFile?.url).toBe('/md/docs/docs.md')
   })
 })
 
